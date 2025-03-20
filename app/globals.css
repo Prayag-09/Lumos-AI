@@ -1,27 +1,83 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --color-primary: #4d6bfe;
+	--color-primary: #4d6bfe;
 }
 
-html{
-  @apply scroll-smooth;
+html {
+	@apply scroll-smooth;
 }
 
-::-webkit-scrollbar{
-  display: none;
+::-webkit-scrollbar {
+	display: none;
 }
-.loader div:nth-child(2){
-  animation-delay: 0.2s;
+.loader div:nth-child(2) {
+	animation-delay: 0.2s;
 }
-.loader div:nth-child(3){
-  animation-delay: 0.4s;
-}
-
-code{
-  white-space: pre-wrap !important;
+.loader div:nth-child(3) {
+	animation-delay: 0.4s;
 }
 
-pre{
-  border-radius: 10px !important;
+code {
+	white-space: pre-wrap !important;
+}
+
+pre {
+	border-radius: 10px !important;
+}
+
+/* Use a Harry Potter-inspired font (download "Lumos" or "Parry Hotter" font and import it) */
+@font-face {
+	font-family: 'Lumos';
+	src: url('/fonts/Lumos.ttf') format('truetype'); /* Adjust path as needed */
+}
+
+.lumos-logo span {
+	font-family: 'Lumos', cursive; /* Fallback to cursive if font fails */
+	text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.animate-glow {
+	animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+	0%,
+	100% {
+		opacity: 0.7;
+		text-shadow: 0 0 5px rgba(255, 215, 0, 0.6), 0 0 10px rgba(255, 215, 0, 0.4);
+	}
+	50% {
+		opacity: 1;
+		text-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 25px rgba(255, 215, 0, 0.7);
+	}
+}
+@font-face {
+	font-family: 'Lumos';
+	src: url('/fonts/Lumos.ttf') format('truetype'); /* Adjust path to your font file */
+}
+
+.font-lumos {
+	font-family: 'Lumos', cursive;
+}
+
+.animate-glow {
+	animation: glow 1.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+	0%,
+	100% {
+		box-shadow: 0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+	}
+}
+
+/* Optional: Add a parchment texture background */
+form {
+	background-image: url('/path/to/parchment-texture.jpg'); /* Add a subtle parchment texture */
+	background-size: cover;
+	background-blend-mode: overlay;
 }

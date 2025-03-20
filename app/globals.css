@@ -23,14 +23,6 @@ pre {
 	border-radius: 10px !important;
 }
 
-/* Lumos Font */
-@font-face {
-	font-family: 'Lumos';
-	src: url('/public/fonts/Lumos.ttf') format('truetype');
-	font-weight: normal;
-	font-style: normal;
-	font-display: swap;
-}
 
 .font-lumos {
 	font-family: 'Lumos', cursive, sans-serif;

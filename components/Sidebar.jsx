@@ -11,8 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // Animation variants for sidebar expansion
 const sidebarVariants = {
-	expanded: { width: '15rem', padding: '0.75rem' },
-	collapsed: { width: '7rem', padding: '0.5rem' },
+	expanded: { width: '16rem', padding: '0.75rem' },
+	collapsed: { width: '8rem', padding: '0.5rem' },
 };
 
 // Animation variants for tooltip
@@ -62,7 +62,7 @@ const Sidebar = ({ expand, setExpand }) => {
 	}, [isLoaded, userId, openSignIn]);
 	return (
 		<motion.div
-			className="flex flex-col justify-between bg-[#1A1C26] bg-[url('/path/to/parchment-texture.jpg')] bg-cover bg-blend-overlay pt-4 max-md:absolute max-md:h-screen max-md:overflow-hidden shadow-lg shadow-[#FFD700]/10 z-50"
+			className='flex flex-col justify-between bg-[#1A1C26] bg-cover bg-blend-overlay pt-4 max-md:absolute max-md:h-screen max-md:overflow-hidden shadow-lg shadow-[#FFD700]/10 z-50'
 			animate={expand ? 'expanded' : 'collapsed'}
 			variants={sidebarVariants}
 			initial={false}
@@ -100,18 +100,22 @@ const Sidebar = ({ expand, setExpand }) => {
 
 					{/* Sidebar Toggle Button */}
 					<motion.div
-						className='group relative flex items-center justify-center h-8 w-8 hover:bg-[#2A2D3A] rounded-lg cursor-pointer transition-colors duration-200 z-50'
+						className='group relative flex items-center justify-center cursor-pointer hover:bg-[#2A2D3A] rounded-lg transition-colors duration-200 z-50'
 						onClick={() => setExpand(!expand)}
 						onMouseEnter={() => setShowTooltip('toggle')}
 						onMouseLeave={() => setShowTooltip(null)}
-						whileHover={{ scale: 1.1, rotate: 5 }}
-						whileTap={{ scale: 0.9 }}>
+						whileHover={{ scale: 1.2, rotate: 5 }}
+						whileTap={{ scale: 0.95 }}
+						style={{
+							width: expand ? '3.5rem' : '3rem',
+							height: expand ? '3.5rem' : '3rem',
+						}}>
 						<Image
 							src={expand ? assets.sidebar_close_icon : assets.sidebar_icon}
 							alt={expand ? 'Close sidebar' : 'Open sidebar'}
-							className='w-8 h-8 hidden md:block'
-							width={20}
-							height={20}
+							className={expand ? 'w-10 h-10' : 'w-8 h-8'}
+							width={expand ? 40 : 32}
+							height={expand ? 40 : 32}
 						/>
 						<Image
 							src={assets.menu_icon}
@@ -168,9 +172,9 @@ const Sidebar = ({ expand, setExpand }) => {
 						<Image
 							src={expand ? assets.chat_icon : assets.chat_icon_dull}
 							alt='New chat'
-							className={expand ? 'w-4 h-4 filter invert' : 'w-5 h-5'}
-							width={expand ? 16 : 20}
-							height={expand ? 16 : 20}
+							className={expand ? 'w-6 h-6 filter invert' : 'w-10 h-10'}
+							width={expand ? 24 : 40}
+							height={expand ? 24 : 40}
 						/>
 					</motion.div>
 					{expand && (
@@ -273,10 +277,10 @@ const Sidebar = ({ expand, setExpand }) => {
 						transition={{ duration: 0.6, ease: 'easeInOut' }}>
 						<Image
 							src={expand ? assets.phone_icon : assets.phone_icon_dull}
-							alt='Get Lumos AI App'
-							className={expand ? 'w-4 h-4' : 'w-5 h-5 mx-auto'}
-							width={expand ? 16 : 20}
-							height={expand ? 16 : 20}
+							alt='Get LumosAI'
+							className={expand ? 'w-6 h-6' : 'w-10 h-10 mx-auto'}
+							width={expand ? 24 : 40}
+							height={expand ? 24 : 40}
 						/>
 					</motion.div>
 					{expand && (
@@ -347,9 +351,9 @@ const Sidebar = ({ expand, setExpand }) => {
 							<Image
 								src={assets.profile_icon}
 								alt='User Profile'
-								className='w-6 h-6 rounded-full border border-[#FFD700]/20 hover:border-[#FFD700]/50 transition-all duration-200'
-								width={24}
-								height={24}
+								className={expand ? 'w-8 h-8' : 'w-8 h-8'}
+								width={expand ? 32 : 40}
+								height={expand ? 32 : 40}
 							/>
 						</motion.div>
 					)}

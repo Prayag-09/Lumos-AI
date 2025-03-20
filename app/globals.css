@@ -92,9 +92,7 @@ pre {
 	filter: invert(1);
 }
 
-/* Parchment Texture Background */
 main {
-	background-image: url('/path/to/parchment-texture.jpg');
 	background-size: cover;
 	background-blend-mode: overlay;
 }

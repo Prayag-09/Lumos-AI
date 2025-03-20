@@ -31,7 +31,7 @@ export const metadata = {
 		title: 'Lumos AI - Illuminate Your Code',
 		description:
 			'Discover Lumos AI, a magical coding assistant inspired by Harry Potter, powered by Gemini.',
-		url: 'https://lumos-ai.example.com',
+		url: 'https://lumos-maxima.vercel.app/',
 		siteName: 'Lumos AI',
 		images: [
 			{

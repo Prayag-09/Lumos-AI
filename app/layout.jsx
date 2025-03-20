@@ -4,15 +4,14 @@ import './prism.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { AppContextProvider } from '@/context/AppContext';
 import { Toaster } from 'react-hot-toast';
+import { dark } from '@clerk/themes';
 
-// Configure the Inter font
 const inter = Inter({
 	variable: '--font-inter',
 	subsets: ['latin'],
 	display: 'swap',
 });
 
-// Enhanced metadata for SEO and accessibility
 export const metadata = {
 	title: {
 		default: 'Lumos AI - Illuminate Your Code',
@@ -60,7 +59,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 	return (
-		<ClerkProvider>
+		<ClerkProvider
+			appearance={{
+				baseTheme: dark,
+			}}>
 			<AppContextProvider>
 				<html lang='en' suppressHydrationWarning>
 					<body

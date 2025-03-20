@@ -12,27 +12,27 @@ export async function POST(req) {
 		const { chatId, prompt } = await req.json();
 
 		if (!userId) {
-			return NextResponse.json({
-				success: false,
-				message: 'User not authenticated',
-			});
+			return NextResponse.json(
+				{ success: false, message: 'User not authenticated' },
+				{ status: 401 }
+			);
 		}
 
 		if (!prompt || prompt.trim() === '') {
-			return NextResponse.json({
-				success: false,
-				message: 'Prompt cannot be empty',
-			});
+			return NextResponse.json(
+				{ success: false, message: 'Prompt cannot be empty' },
+				{ status: 400 }
+			);
 		}
 
 		await connectDB();
-		const data = await Chat.findOne({ userId, _id: chatId });
+		const chatData = await Chat.findOne({ userId, _id: chatId });
 
-		if (!data) {
-			return NextResponse.json({
-				success: false,
-				message: 'Chat not found for this user',
-			});
+		if (!chatData) {
+			return NextResponse.json(
+				{ success: false, message: 'Chat not found for this user' },
+				{ status: 404 }
+			);
 		}
 
 		const userPrompt = {
@@ -41,25 +41,40 @@ export async function POST(req) {
 			timestamp: Date.now(),
 		};
 
-		data.messages.push(userPrompt);
+		chatData.messages.push(userPrompt);
 
-		// Gemini call
+		// Gemini API call
 		const result = await model.generateContent({
 			contents: [{ role: 'user', parts: [{ text: prompt }] }],
 		});
 
-		const messageContent = result.response.text();
-		const message = {
+		const messageContent = result?.response?.text();
+
+		if (!messageContent || messageContent.trim() === '') {
+			return NextResponse.json(
+				{ success: false, message: 'No response generated from Gemini API' },
+				{ status: 500 }
+			);
+		}
+
+		const assistantMessage = {
 			role: 'assistant',
 			content: messageContent,
 			timestamp: Date.now(),
 		};
 
-		data.messages.push(message);
-		await data.save();
+		chatData.messages.push(assistantMessage);
+		await chatData.save();
 
-		return NextResponse.json({ success: true, data: message });
+		return NextResponse.json(
+			{ success: true, data: assistantMessage },
+			{ status: 200 }
+		);
 	} catch (error) {
-		return NextResponse.json({ success: false, error: error.message });
+		console.error('Chat API error:', error);
+		return NextResponse.json(
+			{ success: false, error: error.message },
+			{ status: 500 }
+		);
 	}
 }

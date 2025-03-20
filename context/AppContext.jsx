@@ -1,14 +1,18 @@
 'use client';
 import { useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+	createContext,
+	useContext,
+	useEffect,
+	useState,
+	useCallback,
+} from 'react';
 import toast from 'react-hot-toast';
 
 export const AppContext = createContext();
 
-export const useAppContext = () => {
-	return useContext(AppContext);
-};
+export const useAppContext = () => useContext(AppContext);
 
 export const AppContextProvider = ({ children }) => {
 	const { user } = useUser();
@@ -17,13 +21,43 @@ export const AppContextProvider = ({ children }) => {
 	const [chats, setChats] = useState([]);
 	const [selectedChat, setSelectedChat] = useState(null);
 
-	const createNewChat = async () => {
+	const fetchUsersChats = useCallback(async () => {
+		try {
+			const token = await getToken();
+			const { data } = await axios.get('/api/chat/get', {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			if (data.success) {
+				const sortedChats = data.data.sort(
+					(a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+				);
+
+				setChats(sortedChats);
+
+				if (sortedChats.length > 0) {
+					setSelectedChat(sortedChats[0]);
+				} else {
+					// Auto-create if no chats
+					const createdChat = await createNewChat();
+					if (createdChat) setSelectedChat(createdChat);
+				}
+			} else {
+				toast.error(data.message);
+			}
+		} catch (error) {
+			toast.error(error.message);
+		}
+	}, [getToken]);
+
+	const createNewChat = useCallback(async () => {
 		try {
 			if (!user) return null;
-
 			const token = await getToken();
 
-			await axios.post(
+			const { data } = await axios.post(
 				'/api/chat/create',
 				{},
 				{
@@ -33,51 +67,24 @@ export const AppContextProvider = ({ children }) => {
 				}
 			);
 
-			fetchUsersChats();
-		} catch (error) {
-			toast.error(error.message);
-		}
-	};
-
-	const fetchUsersChats = async () => {
-		try {
-			const token = await getToken();
-			const { data } = await axios.get('/api/chat/get', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-			if (data.success) {
-				console.log(data.data);
-				setChats(data.data);
-
-				// If the user has no chats, create one
-				if (data.data.length === 0) {
-					await createNewChat();
-					return fetchUsersChats();
-				} else {
-					// sort chats by updated date
-					data.data.sort(
-						(a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
-					);
-
-					// set recently updated chat as selected chat
-					setSelectedChat(data.data[0]);
-					console.log(data.data[0]);
-				}
+			if (data.success && data.chat) {
+				// Update state immediately
+				setChats((prev) => [data.chat, ...prev]);
+				setSelectedChat(data.chat);
+				return data.chat;
 			} else {
-				toast.error(data.message);
+				toast.error(data.message || 'Chat creation failed');
 			}
 		} catch (error) {
 			toast.error(error.message);
 		}
-	};
+	}, [getToken, user]);
 
 	useEffect(() => {
 		if (user) {
 			fetchUsersChats();
 		}
-	}, [user]);
+	}, [user, fetchUsersChats]);
 
 	const value = {
 		user,

@@ -1,9 +1,5 @@
 @import 'tailwindcss';
 
-@theme {
-	--color-primary: #4d6bfe;
-}
-
 html {
 	@apply scroll-smooth;
 }
@@ -11,6 +7,7 @@ html {
 ::-webkit-scrollbar {
 	display: none;
 }
+
 .loader div:nth-child(2) {
 	animation-delay: 0.2s;
 }
@@ -26,58 +23,78 @@ pre {
 	border-radius: 10px !important;
 }
 
-/* Use a Harry Potter-inspired font (download "Lumos" or "Parry Hotter" font and import it) */
+/* Lumos Font */
 @font-face {
 	font-family: 'Lumos';
-	src: url('/fonts/Lumos.ttf') format('truetype'); /* Adjust path as needed */
-}
-
-.lumos-logo span {
-	font-family: 'Lumos', cursive; /* Fallback to cursive if font fails */
-	text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
-}
-
-.animate-glow {
-	animation: glow 2s ease-in-out infinite;
-}
-
-@keyframes glow {
-	0%,
-	100% {
-		opacity: 0.7;
-		text-shadow: 0 0 5px rgba(255, 215, 0, 0.6), 0 0 10px rgba(255, 215, 0, 0.4);
-	}
-	50% {
-		opacity: 1;
-		text-shadow: 0 0 15px rgba(255, 215, 0, 1), 0 0 25px rgba(255, 215, 0, 0.7);
-	}
-}
-@font-face {
-	font-family: 'Lumos';
-	src: url('/fonts/Lumos.ttf') format('truetype'); /* Adjust path to your font file */
+	src: url('/fonts/Lumos.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
 }
 
 .font-lumos {
-	font-family: 'Lumos', cursive;
+	font-family: 'Lumos', cursive, sans-serif;
 }
 
-.animate-glow {
-	animation: glow 1.5s ease-in-out infinite;
+/* Inter Font for Body Text */
+.font-inter {
+	font-family: 'Inter', sans-serif;
 }
 
+/* Lumos Logo Glow */
+.lumos-logo span {
+	font-family: 'Lumos', cursive, sans-serif;
+	text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* Glow Animation */
 @keyframes glow {
 	0%,
 	100% {
+		text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 15px #ffd700;
 		box-shadow: 0 0 5px rgba(255, 215, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.3);
 	}
 	50% {
+		text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700;
 		box-shadow: 0 0 15px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
 	}
 }
 
-/* Optional: Add a parchment texture background */
-form {
-	background-image: url('/path/to/parchment-texture.jpg'); /* Add a subtle parchment texture */
+.animate-glow {
+	animation: glow 2s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+.scrollbar-thin {
+	scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+	width: 6px;
+	display: block;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+	background: var(--scrollbar-track, #1a1c26);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+	background: var(--scrollbar-thumb, #ffd700);
+	border-radius: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+	background: var(--scrollbar-thumb-hover, #ffd700);
+}
+
+/* Invert filter for icons */
+.filter.invert {
+	filter: invert(1);
+}
+
+/* Parchment Texture Background */
+main {
+	background-image: url('/path/to/parchment-texture.jpg');
 	background-size: cover;
 	background-blend-mode: overlay;
 }

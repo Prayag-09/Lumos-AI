@@ -11,10 +11,7 @@ export default async function connectDB() {
 
 	if (!cached.promise) {
 		cached.promise = mongoose
-			.connect(process.env.MONGODB_URI, {
-				useNewUrlParser: true,
-				useUnifiedTopology: true,
-			})
+			.connect(process.env.MONGODB_URI)
 			.then((mongoose) => mongoose);
 	}
 
@@ -23,7 +20,7 @@ export default async function connectDB() {
 		console.log('✅ Connected to MongoDB');
 	} catch (error) {
 		console.error('❌ Error connecting to MongoDB:', error);
-		throw error; // Don't swallow the error
+		throw error;
 	}
 
 	global.mongoose = cached;

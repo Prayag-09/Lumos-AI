@@ -125,7 +125,7 @@ const Message = ({ role, content }) => {
 							<Image
 								src={assets.logo_icon}
 								alt='Bot logo'
-								className='h-9 w-9 p-1 rounded-full shadow-md shadow-[#FFD700]/20'
+								className='h-10 w-10 p-1 rounded-full shadow-md shadow-[#FFD700]/20'
 								width={36}
 								height={36}
 							/>

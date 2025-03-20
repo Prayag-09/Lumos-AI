@@ -2,16 +2,17 @@
 
 import { assets } from '@/assets/assets';
 import Image from 'next/image';
-import React, { useState } from 'react';
-import { useClerk, UserButton } from '@clerk/nextjs';
+
+import React, { useState, useEffect } from 'react';
+import { useAuth, useClerk, UserButton } from '@clerk/nextjs';
 import { useAppContext } from '@/context/AppContext';
 import ChatLabel from './ChatLabel';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Animation variants for sidebar expansion
 const sidebarVariants = {
-	expanded: { width: '15rem', padding: '0.75rem' }, // Reduced width and padding
-	collapsed: { width: '4rem', padding: '0.5rem' },
+	expanded: { width: '15rem', padding: '0.75rem' },
+	collapsed: { width: '7rem', padding: '0.5rem' },
 };
 
 // Animation variants for tooltip
@@ -48,11 +49,17 @@ const logoVariants = {
 };
 
 const Sidebar = ({ expand, setExpand }) => {
+	const { userId, isLoaded } = useAuth();
 	const { openSignIn } = useClerk();
 	const { user, chats, createNewChat } = useAppContext();
 	const [openMenu, setOpenMenu] = useState({ id: 0, open: false });
 	const [showTooltip, setShowTooltip] = useState(null);
 
+	useEffect(() => {
+		if (isLoaded && !userId) {
+			openSignIn();
+		}
+	}, [isLoaded, userId, openSignIn]);
 	return (
 		<motion.div
 			className="flex flex-col justify-between bg-[#1A1C26] bg-[url('/path/to/parchment-texture.jpg')] bg-cover bg-blend-overlay pt-4 max-md:absolute max-md:h-screen max-md:overflow-hidden shadow-lg shadow-[#FFD700]/10 z-50"
@@ -70,11 +77,13 @@ const Sidebar = ({ expand, setExpand }) => {
 						initial='hidden'
 						animate='visible'>
 						<Image
-							className='rounded-full border-2 border-[#FFD700]/40 hover:border-[#FFD700]/60 transition-all duration-300'
+							className={`rounded-full border-4 border-[#FFD700]/50 hover:border-[#FFD700]/70 transition-all duration-300 shadow-xl shadow-[#FFD700]/30
+	${expand ? 'w-16 h-16' : 'w-20 h-20'}`}
 							src='https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZtanhzY2tpdWpteTh2Z2NodWJ2dzBya2d2c2R1anFydWdsZzhweSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/dgzRXtAF6gTd0xXMJx/giphy.gif'
 							alt='Lumos AI Logo'
-							width={expand ? 60 : 48}
-							height={expand ? 60 : 48}
+							width={0}
+							height={0}
+							priority
 						/>
 					</motion.div>
 
@@ -84,8 +93,8 @@ const Sidebar = ({ expand, setExpand }) => {
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.3, delay: 0.2, ease: 'easeOut' }}>
-						<span className='text-[#FFD700] font-lumos text-xl md:text-2xl tracking-wide'>
-							Lumos AI
+						<span className='text-[#FFD700] font-lumos text-5xl md:text-3xl tracking-wider drop-shadow-lg'>
+							Lumos AI ✨
 						</span>
 					</motion.div>
 
@@ -280,9 +289,9 @@ const Sidebar = ({ expand, setExpand }) => {
 							<Image
 								src={assets.new_icon}
 								alt='New'
-								className='w-3 h-3'
-								width={12}
-								height={12}
+								className='w-10 h-10'
+								width={20}
+								height={20}
 							/>
 						</motion.div>
 					)}
@@ -333,7 +342,8 @@ const Sidebar = ({ expand, setExpand }) => {
 					) : (
 						<motion.div
 							whileHover={{ rotate: 5 }}
-							transition={{ duration: 0.2 }}>
+							transition={{ duration: 0.2 }}
+							onClick={openSignIn}>
 							<Image
 								src={assets.profile_icon}
 								alt='User Profile'

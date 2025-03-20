@@ -7,7 +7,7 @@ import Image from 'next/image';
 import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-
+import { useClerk } from '@clerk/nextjs';
 // Animation variants for the form
 const formVariants = {
 	hidden: { opacity: 0, y: 20 },
@@ -18,7 +18,6 @@ const formVariants = {
 	},
 };
 
-// Animation for button glow
 const buttonVariants = {
 	idle: { scale: 1 },
 	loading: {
@@ -32,13 +31,13 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 	const { user, chats, setChats, selectedChat, setSelectedChat } =
 		useAppContext();
 	const textareaRef = useRef(null);
+	const { openSignIn } = useClerk();
 
-	// Auto-resize textarea based on content
 	useEffect(() => {
 		const textarea = textareaRef.current;
 		if (textarea) {
-			textarea.style.height = 'auto'; // Reset height
-			textarea.style.height = `${textarea.scrollHeight}px`; // Set to scroll height
+			textarea.style.height = 'auto';
+			textarea.style.height = `${textarea.scrollHeight}px`;
 		}
 	}, [prompt]);
 
@@ -55,7 +54,8 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 		try {
 			if (!user) {
-				toast.error('Login to send a message');
+				toast.error('Please sign in to send a message');
+				openSignIn();
 				return;
 			}
 			if (!selectedChat) {
@@ -195,17 +195,21 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 					<motion.button
 						type='button'
 						className='flex items-center gap-2 text-xs border border-[#FFD700]/40 px-3 py-1.5 rounded-full cursor-pointer hover:bg-[#2A2D3A] transition text-[#E6E6FA] font-inter'
-						whileHover={{ scale: 1.05 }}
+						whileHover={{
+							scale: 1.08,
+							rotate: 2,
+							boxShadow: '0 0 8px rgba(255, 215, 0, 0.6)',
+						}}
 						whileTap={{ scale: 0.95 }}
-						aria-label='DeepThink mode'>
+						aria-label='Invoke Wisdom mode'>
 						<Image
 							src={assets.scroll_icon || assets.deepthink_icon}
-							alt='DeepThink mode'
+							alt='Invoke Wisdom icon'
 							className='h-5 w-5'
 							width={20}
 							height={20}
 						/>
-						DeepThink (R1)
+						Invoke Wisdom ✨
 					</motion.button>
 					<motion.button
 						type='button'
@@ -214,7 +218,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 						whileTap={{ scale: 0.95 }}
 						aria-label='Search mode'>
 						<Image
-							src={assets.wand_icon || assets.search_icon}
+							src={assets.search_icon}
 							alt='Search mode'
 							className='h-5 w-5'
 							width={20}
@@ -256,7 +260,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 							className='w-4 h-4'
 							src={
 								prompt && !isLoading
-									? assets.wand_icon || assets.arrow_icon
+									? assets.arrow_icon
 									: assets.arrow_icon_dull
 							}
 							alt='Send prompt'

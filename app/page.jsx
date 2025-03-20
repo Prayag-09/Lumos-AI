@@ -9,13 +9,11 @@ import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Animation variants for welcome message
 const welcomeVariants = {
 	hidden: { opacity: 0, y: 20 },
 	visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: 'easeOut' } },
 };
 
-// Animation variants for messages
 const messageVariants = {
 	hidden: { opacity: 0, y: 10 },
 	visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -28,16 +26,14 @@ export default function Home() {
 	const { selectedChat } = useAppContext();
 	const containerRef = useRef(null);
 
-	// Update messages when selectedChat changes
 	useEffect(() => {
 		if (selectedChat) {
-			setMessages(selectedChat.messages || []); // ✅ Safe fallback
+			setMessages(selectedChat.messages || []);
 		} else {
 			setMessages([]);
 		}
 	}, [selectedChat]);
 
-	// Auto-scroll to the bottom when messages change
 	useEffect(() => {
 		if (containerRef.current) {
 			containerRef.current.scrollTo({
@@ -48,10 +44,19 @@ export default function Home() {
 	}, [messages]);
 
 	return (
-		<div className='relative'>
-			<div className='flex h-screen'>
+		<div className='relative overflow-hidden'>
+			{/* Floating Snitch */}
+			<Image
+				src='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjloNTg4NzZxaTBrN2c5M3BneGhxOTBycWI1a2JmejQ5cmF6eGJxYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7whxLJtwE80Ny/giphy.gif'
+				alt='Golden Snitch'
+				width={80}
+				height={80}
+				className='absolute top-10 right-10 opacity-80 animate-pulse z-0'
+			/>
+
+			<div className='flex h-screen relative z-10'>
 				<Sidebar expand={expand} setExpand={setExpand} />
-				<div className='flex-1 flex flex-col items-center justify-center px-4 pb-8 bg-[#1A1C26] text-[#E6E6FA] relative'>
+				<div className='flex-1 flex flex-col items-center justify-center px-4 pb-8 bg-gradient-to-b from-[#0f0f1a] via-[#1A1C26] to-[#2a2c3b] text-[#E6E6FA] relative'>
 					{/* Mobile Header */}
 					<div className='md:hidden absolute px-4 top-6 flex items-center justify-between w-full'>
 						<Image
@@ -74,36 +79,33 @@ export default function Home() {
 					{/* Welcome Message or Chat Content */}
 					{Array.isArray(messages) && messages.length === 0 ? (
 						<motion.div
-							className='text-center'
+							className='text-center flex flex-col items-center'
 							initial='hidden'
 							animate='visible'
 							variants={welcomeVariants}>
-							<div className='flex items-center gap-3'>
-								<Image
-									src={assets.logo_icon}
-									alt='Lumos AI Logo'
-									className='h-16 w-16'
-									width={64}
-									height={64}
-								/>
-								<h1 className='text-2xl font-medium font-lumos text-[#FFD700]'>
-									Welcome to Lumos AI
-								</h1>
-							</div>
-							<p className='text-sm mt-2 text-[#E6E6FA]/80'>
-								Cast a spell to start coding—how can I assist you today?
+							<Image
+								src='https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWxiaDZ5Mjh4YmdxcnpmZ2NsbXlpYmpnZ3FtZmc4bHNlcmpwdDhrYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/LGe9GzmIFm85iQQkEI/giphy.gif'
+								alt='Hogwarts Castle'
+								width={300}
+								height={300}
+								className='mb-4'
+							/>
+							<h1 className='text-3xl font-bold text-[#FFD700] font-lumos'>
+								"Lumos Maxima!"
+							</h1>
+							<p className='text-md mt-2 text-[#E6E6FA]/80 italic'>
+								Illuminate your coding magic. How may I assist, wizard?
 							</p>
 						</motion.div>
 					) : (
 						<div
 							ref={containerRef}
 							className='relative flex flex-col items-center justify-start w-full mt-20 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-[#FFD700]/30 scrollbar-track-[#1A1C26]'>
-							{/* Chat Name Header */}
-							<p className='fixed top-8 border border-[#FFD700]/20 hover:border-[#FFD700]/50 py-1 px-2 rounded-lg font-semibold bg-[#1A1C26]/80 backdrop-blur-sm mb-6'>
-								{selectedChat?.name || 'Untitled Chat'}
+							{/* Chat Name Header Marauder's Map Style */}
+							<p className='fixed top-8 bg-[#1A1C26]/90 border-2 border-dotted border-[#FFD700] py-2 px-4 rounded-full font-extrabold text-[#FFD700] shadow-lg'>
+								{selectedChat?.name || 'Mischief Managed'}
 							</p>
 
-							{/* Messages */}
 							<AnimatePresence>
 								{messages.map((msg, index) => (
 									<motion.div
@@ -118,7 +120,7 @@ export default function Home() {
 								))}
 							</AnimatePresence>
 
-							{/* Loading Indicator */}
+							{/* Wand Spark Loading Indicator */}
 							{isLoading && (
 								<motion.div
 									className='flex gap-4 max-w-3xl w-full py-3'
@@ -128,28 +130,29 @@ export default function Home() {
 									<Image
 										className='h-9 w-9 p-1 border border-[#E6E6FA]/15 rounded-full'
 										src={assets.logo_icon}
-										alt='Lumos AI Logo'
+										alt='Lumos Logo'
 										width={36}
 										height={36}
 									/>
-									<div className='loader flex justify-center items-center gap-1'>
-										<div className='w-1 h-1 rounded-full bg-[#FFD700] animate-bounce [animation-delay:0ms]'></div>
-										<div className='w-1 h-1 rounded-full bg-[#FFD700] animate-bounce [animation-delay:150ms]'></div>
-										<div className='w-1 h-1 rounded-full bg-[#FFD700] animate-bounce [animation-delay:300ms]'></div>
-									</div>
+									<Image
+										src='https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif'
+										alt='Wand Spark Loading'
+										width={60}
+										height={60}
+									/>
 								</motion.div>
 							)}
 						</div>
 					)}
 
-					{/* Prompt Box */}
 					<div className='w-full max-w-3xl mt-4'>
-						<PromptBox isLoading={isLoading} setIsLoading={setIsLoading} />
+						<div className='transition-all focus-within:ring-2 focus-within:ring-yellow-400 rounded-xl'>
+							<PromptBox isLoading={isLoading} setIsLoading={setIsLoading} />
+						</div>
 					</div>
 
-					{/* Disclaimer */}
 					<p className='text-xs absolute bottom-1 text-[#E6E6FA]/50'>
-						AI-generated content, for reference only
+						⚡ Powered by magic. Use responsibly, wizard!
 					</p>
 				</div>
 			</div>

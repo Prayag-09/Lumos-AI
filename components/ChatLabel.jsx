@@ -42,7 +42,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 	const handleRename = async (e) => {
 		e.preventDefault();
 		if (!newName.trim()) {
-			toast.error('Chat name cannot be empty');
+			toast.error('Chat name cannot be empty.');
 			return;
 		}
 		try {
@@ -51,13 +51,13 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 				name: newName.trim(),
 			});
 			if (data.success) {
-				toast.success('Renamed');
+				toast.success('Chat renamed!');
 				fetchUsersChats();
 				setRenameMode(false);
 				setOpenMenu({ id: 0, open: false });
 			}
 		} catch (err) {
-			toast.error('Something went wrong');
+			toast.error('Rename failed.');
 		}
 	};
 
@@ -68,12 +68,12 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 			setIsDeleting(true);
 			const { data } = await axios.post('/api/chat/delete', { chatId: id });
 			if (data.success) {
-				toast.success('Deleted');
+				toast.success('Chat deleted.');
 				fetchUsersChats();
 				setOpenMenu({ id: 0, open: false });
 			}
 		} catch (err) {
-			toast.error('Something went wrong');
+			toast.error('Delete failed.');
 		} finally {
 			setIsDeleting(false);
 		}
@@ -81,24 +81,25 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 
 	return (
 		<motion.div
-			className='relative flex items-center justify-between p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A]'
+			className='relative flex items-center justify-between p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] select-none'
 			onClick={selectChat}>
 			<p className='truncate text-sm text-[#E6E6FA]'>
-				{name || 'Unnamed Chat'}
+				{name || 'Untitled Chat'}
 			</p>
 
 			<div className='relative'>
-				<button
+				<motion.button
 					onClick={toggleMenu}
-					className='h-6 w-6 flex items-center justify-center rounded-full hover:bg-[#2A2D3A]'
+					className='h-7 w-7 flex items-center justify-center rounded-full hover:bg-[#2A2D3A]'
+					whileHover={{ scale: 1.15 }}
 					aria-label='Chat options'>
-					<Image src={assets.three_dots} alt='options' width={14} height={14} />
-				</button>
+					<Image src={assets.three_dots} alt='Options' width={16} height={16} />
+				</motion.button>
 
 				<AnimatePresence>
 					{openMenu.id === id && openMenu.open && (
 						<motion.div
-							className='absolute right-0 top-8 bg-[#1A1C26] border border-gray-700 rounded-md p-2 w-36 z-50 space-y-1'
+							className='absolute right-0 top-9 bg-[#1A1C26] border border-gray-700 rounded-md p-2 w-40 shadow-lg z-50 space-y-1'
 							initial='hidden'
 							animate='visible'
 							exit='exit'
@@ -112,6 +113,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 										onChange={(e) => setNewName(e.target.value)}
 										autoFocus
 										className='w-full text-xs px-2 py-1 rounded bg-[#2A2D3A] border border-gray-600 text-[#E6E6FA]'
+										placeholder='New chat name...'
 									/>
 									<button
 										type='submit'
@@ -123,12 +125,14 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 								<>
 									<button
 										onClick={() => setRenameMode(true)}
-										className='w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded'>
+										className='w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-[#E6E6FA]'>
 										Rename
 									</button>
 									<button
 										onClick={handleDelete}
-										className='w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-red-400'
+										className={`w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded ${
+											isDeleting ? 'text-gray-400' : 'text-red-400'
+										}`}
 										disabled={isDeleting}>
 										{isDeleting ? 'Deleting...' : 'Delete'}
 									</button>

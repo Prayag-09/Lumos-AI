@@ -7,6 +7,7 @@ import {
 	useEffect,
 	useState,
 	useCallback,
+	useMemo,
 } from 'react';
 import toast from 'react-hot-toast';
 
@@ -20,9 +21,12 @@ export const AppContextProvider = ({ children }) => {
 
 	const [chats, setChats] = useState([]);
 	const [selectedChat, setSelectedChat] = useState(null);
+	const [loadingChats, setLoadingChats] = useState(false);
 
 	const fetchUsersChats = useCallback(async () => {
+		if (!user) return;
 		try {
+			setLoadingChats(true);
 			const token = await getToken();
 			const { data } = await axios.get('/api/chat/get', {
 				headers: {
@@ -36,25 +40,30 @@ export const AppContextProvider = ({ children }) => {
 				);
 
 				setChats(sortedChats);
-
+				// Only select chat if there are existing chats
 				if (sortedChats.length > 0) {
 					setSelectedChat(sortedChats[0]);
-				} else {
-					// Auto-create if no chats
-					const createdChat = await createNewChat();
-					if (createdChat) setSelectedChat(createdChat);
 				}
 			} else {
-				toast.error(data.message);
+				toast.error(data.message || 'Failed to load chats.');
 			}
 		} catch (error) {
-			toast.error(error.message);
+			toast.error(
+				error.response?.data?.message ||
+					error.message ||
+					'An unexpected error occurred while fetching chats.'
+			);
+		} finally {
+			setLoadingChats(false);
 		}
-	}, [getToken]);
+	}, [getToken, user]);
 
 	const createNewChat = useCallback(async () => {
 		try {
-			if (!user) return null;
+			if (!user) {
+				toast.error('Please log in to create a chat.');
+				return null;
+			}
 			const token = await getToken();
 
 			const { data } = await axios.post(
@@ -68,15 +77,20 @@ export const AppContextProvider = ({ children }) => {
 			);
 
 			if (data.success && data.chat) {
-				// Update state immediately
 				setChats((prev) => [data.chat, ...prev]);
 				setSelectedChat(data.chat);
 				return data.chat;
 			} else {
 				toast.error(data.message || 'Chat creation failed');
+				return null;
 			}
 		} catch (error) {
-			toast.error(error.message);
+			toast.error(
+				error.response?.data?.message ||
+					error.message ||
+					'An unexpected error occurred while creating chat.'
+			);
+			return null;
 		}
 	}, [getToken, user]);
 
@@ -86,15 +100,21 @@ export const AppContextProvider = ({ children }) => {
 		}
 	}, [user, fetchUsersChats]);
 
-	const value = {
-		user,
-		chats,
-		setChats,
-		selectedChat,
-		setSelectedChat,
-		fetchUsersChats,
-		createNewChat,
-	};
+	const contextValue = useMemo(
+		() => ({
+			user,
+			chats,
+			setChats,
+			selectedChat,
+			setSelectedChat,
+			fetchUsersChats,
+			createNewChat,
+			loadingChats,
+		}),
+		[user, chats, selectedChat, fetchUsersChats, createNewChat, loadingChats]
+	);
 
-	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+	return (
+		<AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
+	);
 };

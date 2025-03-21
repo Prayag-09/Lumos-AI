@@ -11,8 +11,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // Animation variants for sidebar expansion
 const sidebarVariants = {
-	expanded: { width: '16rem', padding: '0.75rem' },
-	collapsed: { width: '8rem', padding: '0.5rem' },
+	expanded: { width: '12rem', padding: '0.75rem' },
+	collapsed: { width: '6rem', padding: '0.5rem' },
 };
 
 // Animation variants for tooltip
@@ -75,7 +75,8 @@ const Sidebar = ({ expand, setExpand }) => {
 					<motion.div
 						variants={logoVariants}
 						initial='hidden'
-						animate='visible'>
+						animate='visible'
+						className={` ${expand ? 'hidden' : 'block'}`}>
 						<Image
 							className={`rounded-full border-4 border-[#FFD700]/50 hover:border-[#FFD700]/70 transition-all duration-300 shadow-xl shadow-[#FFD700]/30
 	${expand ? 'w-16 h-16' : 'w-20 h-20'}`}
@@ -179,7 +180,7 @@ const Sidebar = ({ expand, setExpand }) => {
 					</motion.div>
 					{expand && (
 						<motion.p
-							className='text-sm font-lumos tracking-wide'
+							className='text-base font-black font-lumos tracking-wide'
 							initial={{ opacity: 0, x: -10 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.3, delay: 0.1 }}>
@@ -212,12 +213,13 @@ const Sidebar = ({ expand, setExpand }) => {
 					animate={{ opacity: expand ? 1 : 0 }}
 					transition={{ duration: 0.4, delay: 0.2 }}>
 					<motion.p
-						className='text-base font-medium text-[#E6E6FA]/80 mb-2 font-lumos tracking-wide'
+						className='text-xl font-medium text-[#E6E6FA]/80 mb-2 font-lumos tracking-wide'
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.3, delay: 0.2 }}>
-						Recent Chats
+						Recent Chats ↓
 					</motion.p>
+					<hr />
 					<div className='space-y-2 max-h-[50vh] overflow-y-visible pr-1'>
 						{' '}
 						{/* Reduced space-y-6 to space-y-2 */}
@@ -253,7 +255,7 @@ const Sidebar = ({ expand, setExpand }) => {
 
 			{/* Bottom Section */}
 			<motion.div
-				className='pb-3 px-3 border-t border-[#FFD700]/10' // Reduced padding
+				className='pb-3 px-3 border-t border-[#FFD700]/10'
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.4, delay: 0.3 }}>
@@ -289,7 +291,7 @@ const Sidebar = ({ expand, setExpand }) => {
 							initial={{ opacity: 0, x: -10 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.3, delay: 0.1 }}>
-							<span className='text-base font-lumos'>Get App</span>
+							<span className='font-bold text-lg font-lumos'>Get App</span>
 							<Image
 								src={assets.new_icon}
 								alt='New'
@@ -318,7 +320,9 @@ const Sidebar = ({ expand, setExpand }) => {
 									width={96}
 									height={96}
 								/>
-								<p className='font-lumos text-xs'>Scan to get Lumos AI App</p>
+								<p className='font-bold text-base font-lumos'>
+									Scan to get Lumos AI App
+								</p>
 								<div
 									className={`w-2 h-2 absolute bg-[#0F1419] rotate-45 ${
 										expand
@@ -359,7 +363,7 @@ const Sidebar = ({ expand, setExpand }) => {
 					)}
 					{expand && (
 						<motion.span
-							className='text-base font-lumos'
+							className='font-bold text-lg font-lumos'
 							initial={{ opacity: 0, x: -10 }}
 							animate={{ opacity: 1, x: 0 }}
 							transition={{ duration: 0.3, delay: 0.1 }}>

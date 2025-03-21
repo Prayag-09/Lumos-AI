@@ -6,6 +6,7 @@ const nextConfig = {
 			'media4.giphy.com',
 			'media1.giphy.com',
 			'media3.giphy.com',
+			'media.giphy.com',
 		],
 	},
 };

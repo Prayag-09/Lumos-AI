@@ -83,7 +83,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 		<motion.div
 			className='relative flex items-center justify-between p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] select-none'
 			onClick={selectChat}>
-			<p className='truncate text-sm text-[#E6E6FA]'>
+			<p className='truncate  text-[#E6E6FA] font-lumos text-lg font-bold'>
 				{name || 'Untitled Chat'}
 			</p>
 

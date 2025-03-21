@@ -14,7 +14,7 @@ const menuVariants = {
 		opacity: 1,
 		y: 0,
 		scale: 1,
-		transition: { duration: 0.2 },
+		transition: { duration: 0.2, ease: 'easeOut' },
 	},
 	exit: { opacity: 0, y: -5, scale: 0.95, transition: { duration: 0.15 } },
 };
@@ -63,7 +63,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 
 	const handleDelete = async (e) => {
 		e.stopPropagation();
-		if (!window.confirm('Delete this chat?')) return;
+		if (!window.confirm('Are you sure you want to delete this chat?')) return;
 		try {
 			setIsDeleting(true);
 			const { data } = await axios.post('/api/chat/delete', { chatId: id });
@@ -81,25 +81,32 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 
 	return (
 		<motion.div
-			className='relative flex items-center justify-between p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] select-none'
+			className='relative flex items-center justify-between p-2 sm:p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] select-none transition-colors'
 			onClick={selectChat}>
-			<p className='truncate  text-[#E6E6FA] font-lumos text-lg font-bold'>
+			<p className='truncate text-[#E6E6FA] font-lumos text-sm sm:text-base md:text-lg font-bold'>
 				{name || 'Untitled Chat'}
 			</p>
 
 			<div className='relative'>
 				<motion.button
 					onClick={toggleMenu}
-					className='h-7 w-7 flex items-center justify-center rounded-full hover:bg-[#2A2D3A]'
+					className='h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center rounded-full hover:bg-[#2A2D3A] transition-colors'
 					whileHover={{ scale: 1.15 }}
+					whileTap={{ scale: 0.95 }}
 					aria-label='Chat options'>
-					<Image src={assets.three_dots} alt='Options' width={16} height={16} />
+					<Image
+						src={assets.three_dots}
+						alt='Options'
+						width={14}
+						height={14}
+						className='w-3.5 h-3.5 sm:w-4 sm:h-4'
+					/>
 				</motion.button>
 
 				<AnimatePresence>
 					{openMenu.id === id && openMenu.open && (
 						<motion.div
-							className='absolute right-0 top-9 bg-[#1A1C26] border border-gray-700 rounded-md p-2 w-40 shadow-lg z-50 space-y-1'
+							className='absolute right-0 top-8 sm:top-9 bg-[#1A1C26] border border-gray-700 rounded-md p-1.5 sm:p-2 w-40 sm:w-44 shadow-2xl z-50 space-y-1'
 							initial='hidden'
 							animate='visible'
 							exit='exit'
@@ -112,12 +119,12 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 										value={newName}
 										onChange={(e) => setNewName(e.target.value)}
 										autoFocus
-										className='w-full text-xs px-2 py-1 rounded bg-[#2A2D3A] border border-gray-600 text-[#E6E6FA]'
-										placeholder='New chat name...'
+										className='w-full text-xs sm:text-sm px-2 py-1 rounded bg-[#2A2D3A] border border-gray-600 text-[#E6E6FA]'
+										placeholder='Enter new name...'
 									/>
 									<button
 										type='submit'
-										className='bg-yellow-400 px-2 py-1 rounded text-black text-xs hover:bg-yellow-500'>
+										className='bg-yellow-400 px-2 py-1 rounded text-black text-xs sm:text-sm hover:bg-yellow-500'>
 										Save
 									</button>
 								</form>
@@ -125,12 +132,12 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 								<>
 									<button
 										onClick={() => setRenameMode(true)}
-										className='w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-[#E6E6FA]'>
+										className='w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-[#E6E6FA] transition'>
 										Rename
 									</button>
 									<button
 										onClick={handleDelete}
-										className={`w-full text-left text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded ${
+										className={`w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded transition ${
 											isDeleting ? 'text-gray-400' : 'text-red-400'
 										}`}
 										disabled={isDeleting}>

@@ -8,21 +8,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { useClerk } from '@clerk/nextjs';
-// Animation variants for the form
+
 const formVariants = {
 	hidden: { opacity: 0, y: 20 },
-	visible: {
-		opacity: 1,
-		y: 0,
-		transition: { duration: 0.5, ease: 'easeOut' },
-	},
+	visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 };
 
 const buttonVariants = {
 	idle: { scale: 1 },
 	loading: {
-		scale: [1, 1.1, 1],
-		transition: { duration: 0.8, repeat: Infinity },
+		scale: [1, 1.05, 1],
+		transition: { duration: 0.6, repeat: Infinity },
 	},
 };
 
@@ -34,10 +30,9 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 	const { openSignIn } = useClerk();
 
 	useEffect(() => {
-		const textarea = textareaRef.current;
-		if (textarea) {
-			textarea.style.height = 'auto';
-			textarea.style.height = `${textarea.scrollHeight}px`;
+		if (textareaRef.current) {
+			textareaRef.current.style.height = 'auto';
+			textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
 		}
 	}, [prompt]);
 
@@ -50,138 +45,115 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 	const sendPrompt = async (e) => {
 		e.preventDefault();
-		const promptCopy = prompt.trim();
+		const trimmedPrompt = prompt.trim();
+
+		if (!user) {
+			toast.error('Please sign in to continue');
+			openSignIn();
+			return;
+		}
+		if (!selectedChat) {
+			toast.error('No chat selected');
+			return;
+		}
+		if (isLoading) {
+			toast.error('Please wait for the current response');
+			return;
+		}
+		if (!trimmedPrompt) {
+			toast.error('Prompt cannot be empty');
+			return;
+		}
+
+		setIsLoading(true);
+		setPrompt('');
+
+		const userMessage = {
+			role: 'user',
+			content: trimmedPrompt,
+			timestamp: Date.now(),
+		};
+
+		setChats((prev) =>
+			prev.map((chat) =>
+				chat._id === selectedChat._id
+					? { ...chat, messages: [...chat.messages, userMessage] }
+					: chat
+			)
+		);
+		setSelectedChat((prev) => ({
+			...prev,
+			messages: [...(prev.messages || []), userMessage],
+		}));
 
 		try {
-			if (!user) {
-				toast.error('Please sign in to send a message');
-				openSignIn();
-				return;
-			}
-			if (!selectedChat) {
-				toast.error('No chat selected');
-				return;
-			}
-			if (isLoading) {
-				toast.error('Wait for the previous response');
-				return;
-			}
-			if (!promptCopy) {
-				toast.error('Prompt cannot be empty');
-				return;
-			}
-
-			setIsLoading(true);
-			setPrompt('');
-
-			const userPrompt = {
-				role: 'user',
-				content: promptCopy,
-				timestamp: Date.now(),
-			};
-
-			// Ensure selectedChat.messages is an array
-			const selectedChatMessages = Array.isArray(selectedChat.messages)
-				? selectedChat.messages
-				: [];
-
-			// Update chats and selectedChat with user prompt
-			setChats((prevChats) =>
-				prevChats.map((chat) => {
-					const chatMessages = Array.isArray(chat.messages)
-						? chat.messages
-						: [];
-					return chat._id === selectedChat._id
-						? { ...chat, messages: [...chatMessages, userPrompt] }
-						: chat;
-				})
-			);
-
-			setSelectedChat((prev) => ({
-				...prev,
-				messages: [...selectedChatMessages, userPrompt],
-			}));
-
 			const { data } = await axios.post('/api/chat/ai', {
 				chatId: selectedChat._id,
-				prompt: promptCopy,
+				prompt: trimmedPrompt,
 			});
 
-			const message = data?.data?.content;
-			if (!data.success || !message) {
+			if (!data.success || !data.data?.content) {
 				toast.error(data.message || 'No response from assistant');
-				setPrompt(promptCopy);
 				setIsLoading(false);
 				return;
 			}
 
-			const assistantMessage = {
+			const tokens = data.data.content.split(' ');
+			const assistantPlaceholder = {
 				role: 'assistant',
 				content: '',
 				timestamp: Date.now(),
 			};
 
-			// Add placeholder assistant message
-			setChats((prevChats) =>
-				prevChats.map((chat) => {
-					const chatMessages = Array.isArray(chat.messages)
-						? chat.messages
-						: [];
-					return chat._id === selectedChat._id
-						? { ...chat, messages: [...chatMessages, assistantMessage] }
-						: chat;
-				})
+			setChats((prev) =>
+				prev.map((chat) =>
+					chat._id === selectedChat._id
+						? { ...chat, messages: [...chat.messages, assistantPlaceholder] }
+						: chat
+				)
 			);
-
 			setSelectedChat((prev) => ({
 				...prev,
-				messages: [...prev.messages, assistantMessage],
+				messages: [...prev.messages, assistantPlaceholder],
 			}));
 
-			// Stream the assistant's response
-			const messageTokens = message.split(' ');
-			messageTokens.forEach((_, i) => {
+			tokens.forEach((_, i) => {
 				setTimeout(() => {
 					const partialMessage = {
 						role: 'assistant',
-						content: messageTokens.slice(0, i + 1).join(' '),
+						content: tokens.slice(0, i + 1).join(' '),
 						timestamp: Date.now(),
 					};
 					setSelectedChat((prev) => ({
 						...prev,
 						messages: [...prev.messages.slice(0, -1), partialMessage],
 					}));
-					// Ensure loading state is reset after the last token
-					if (i === messageTokens.length - 1) {
-						setIsLoading(false);
-					}
-				}, i * 150);
+					if (i === tokens.length - 1) setIsLoading(false);
+				}, i * 80);
 			});
 		} catch (error) {
-			toast.error(error.message || 'An error occurred');
-			setPrompt(promptCopy);
+			toast.error('Something went wrong');
 			setIsLoading(false);
 		}
 	};
 
-	const hasMessages =
-		selectedChat &&
-		Array.isArray(selectedChat?.messages) &&
-		selectedChat.messages.length > 0;
+	const hasMessages = selectedChat?.messages?.length > 0;
 
 	return (
 		<motion.form
 			onSubmit={sendPrompt}
 			className={`w-full ${
-				hasMessages ? 'max-w-3xl' : 'max-w-2xl'
-			} bg-[#1A1C26] p-4 rounded-3xl mt-4 transition-all shadow-lg border border-[#FFD700]/20`}
+				hasMessages
+					? 'max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl'
+					: 'max-w-sm sm:max-w-md md:max-w-xl lg:max-w-2xl'
+			} bg-[#1A1C26] p-2 sm:p-4 rounded-3xl mt-2 sm:mt-4 shadow-lg border border-[#FFD700]/20`}
 			initial='hidden'
 			animate='visible'
 			variants={formVariants}>
 			<textarea
 				ref={textareaRef}
 				onKeyDown={handleKeyDown}
-				className='outline-none w-full resize-none overflow-hidden break-words bg-transparent text-[#E6E6FA] placeholder-[#E6E6FA]/60 font-lumos text-base md:text-lg'
+				className='outline-none w-full resize-none overflow-hidden break-words bg-transparent text-[#E6E6FA] placeholder-[#E6E6FA]/60 font-lumos text-sm sm:text-base md:text-lg max-h-40'
 				rows={2}
 				placeholder='Cast a spell with Lumos...'
 				required
@@ -190,62 +162,51 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 				aria-label='Enter your prompt'
 			/>
 
-			<div className='flex items-center justify-between text-sm mt-3'>
-				<div className='flex items-center gap-2'>
+			<div className='flex items-center justify-between text-xs sm:text-sm mt-2 flex-wrap gap-2'>
+				<div className='flex items-center gap-1 sm:gap-2'>
 					<motion.button
 						type='button'
-						className='flex items-center gap-2 text-xs border border-[#FFD700]/40 px-3 py-1.5 rounded-full cursor-pointer hover:bg-[#2A2D3A] transition text-[#E6E6FA] font-inter'
-						whileHover={{
-							scale: 1.08,
-							rotate: 2,
-							boxShadow: '0 0 8px rgba(255, 215, 0, 0.6)',
-						}}
-						whileTap={{ scale: 0.95 }}
-						aria-label='Invoke Wisdom mode'>
+						className='flex items-center gap-1 border border-[#FFD700]/40 px-2 py-1 rounded-full cursor-pointer hover:bg-[#2A2D3A] text-[#E6E6FA]'
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}>
 						<Image
-							src={assets.scroll_icon || assets.deepthink_icon}
-							alt='Invoke Wisdom icon'
-							className='h-5 w-5'
-							width={20}
-							height={20}
+							src={assets.deepthink_icon}
+							alt='Wisdom'
+							width={16}
+							height={16}
 						/>
-						Invoke Wisdom ✨
+						<span className='hidden xs:inline'>Wisdom ✨</span>
 					</motion.button>
 					<motion.button
 						type='button'
-						className='flex items-center gap-2 text-xs border border-[#FFD700]/40 px-3 py-1.5 rounded-full cursor-pointer hover:bg-[#2A2D3A] transition text-[#E6E6FA] font-inter'
+						className='flex items-center gap-1 border border-[#FFD700]/40 px-2 py-1 rounded-full cursor-pointer hover:bg-[#2A2D3A] text-[#E6E6FA]'
 						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						aria-label='Search mode'>
+						whileTap={{ scale: 0.95 }}>
 						<Image
 							src={assets.search_icon}
-							alt='Search mode'
-							className='h-5 w-5'
-							width={20}
-							height={20}
+							alt='Search'
+							width={16}
+							height={16}
 						/>
-						Search
+						<span className='hidden xs:inline'>Search</span>
 					</motion.button>
 				</div>
 
-				<div className='flex items-center gap-3'>
-					<motion.div
-						whileHover={{ scale: 1.1, rotate: 5 }}
-						whileTap={{ scale: 0.9 }}>
+				<div className='flex items-center gap-2'>
+					<motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
 						<Image
-							className='w-4 cursor-pointer opacity-60 hover:opacity-100 transition'
+							className='w-4 sm:w-5 h-4 sm:h-5 cursor-pointer opacity-50 hover:opacity-100'
 							src={assets.pin_icon}
-							alt='Pin message'
+							alt='Pin'
 							width={16}
 							height={16}
-							aria-label='Pin message'
 						/>
 					</motion.div>
 					<motion.button
 						type='submit'
 						className={`${
 							prompt && !isLoading
-								? 'bg-[#FFD700] animate-glow'
+								? 'bg-[#FFD700]'
 								: isLoading
 								? 'bg-[#FFD700]/60'
 								: 'bg-[#2A2D3A]'
@@ -254,8 +215,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 						variants={buttonVariants}
 						animate={isLoading ? 'loading' : 'idle'}
 						whileHover={{ scale: 1.1 }}
-						whileTap={{ scale: 0.9 }}
-						aria-label='Send prompt'>
+						whileTap={{ scale: 0.9 }}>
 						<Image
 							className='w-4 h-4'
 							src={
@@ -263,7 +223,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 									? assets.arrow_icon
 									: assets.arrow_icon_dull
 							}
-							alt='Send prompt'
+							alt='Send'
 							width={16}
 							height={16}
 						/>

@@ -1,46 +1,15 @@
-.token.comment {
-	color: #b0b0c0;
-	font-style: italic;
-}
-.token.keyword {
-	color: #e06c75; /* Gryffindor red */
-	font-weight: bold;
-	letter-spacing: 0.03em;
-	transition: color 0.3s ease;
-}
-.token.keyword:hover {
-	color: #ff5555;
-	text-decoration: underline;
-}
-.token.string {
-	color: #98c379; /* Slytherin green */
-}
-.token.number {
-	color: #d19a66; /* Ravenclaw bronze */
-}
-.token.operator {
-	color: #f0d26b; /* Hufflepuff gold */
-	letter-spacing: 0.02em;
-}
-.token.function {
-	color: #61afef; /* Spell names */
-	transition: all 0.2s ease;
-}
-.token.function:hover {
-	text-decoration: underline dotted;
-}
-
 pre {
 	background: linear-gradient(135deg, #0b0c1e 0%, #1c1238 100%);
 	border: 1px solid rgba(240, 210, 107, 0.2);
-	border-radius: 12px;
+	border-radius: 14px;
 	padding: 1em;
 	overflow-x: auto;
 	margin-bottom: 1.5em;
 	box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.03);
 	transition: box-shadow 0.4s ease, transform 0.3s ease;
+	tab-size: 4;
+	word-wrap: break-word;
 }
-
 pre:hover {
 	box-shadow: 0 0 25px rgba(240, 210, 107, 0.3),
 		0 0 50px rgba(230, 200, 90, 0.2);
@@ -54,6 +23,8 @@ code {
 	background: none;
 	padding: 0;
 	color: #f8f8f2;
+	font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+	font-size: 0.95rem;
 }
 
 pre::-webkit-scrollbar {

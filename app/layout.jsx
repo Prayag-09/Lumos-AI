@@ -33,40 +33,19 @@ export const metadata = {
 			'Discover Lumos AI, a magical coding assistant inspired by Harry Potter, powered by Gemini.',
 		url: 'https://lumos-maxima.vercel.app/',
 		siteName: 'Lumos AI',
-		images: [
-			{
-				url: 'https://lumos-ai.example.com/og-image.jpg',
-				width: 1200,
-				height: 630,
-				alt: 'Lumos AI - A magical coding assistant',
-			},
-		],
-		locale: 'en_US',
+		locale: 'en_IN',
 		type: 'website',
 	},
-	twitter: {
-		card: 'summary_large_image',
-		title: 'Lumos AI - Illuminate Your Code',
-		description:
-			'Discover Lumos AI, a magical coding assistant inspired by Harry Potter, powered by Gemini.',
-		images: ['https://lumos-ai.example.com/twitter-image.jpg'],
-	},
-	icons: {
-		icon: '/favicon.ico',
-		apple: '/apple-touch-icon.png',
-	},
+	viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
 export default function RootLayout({ children }) {
 	return (
-		<ClerkProvider
-			appearance={{
-				baseTheme: dark,
-			}}>
+		<ClerkProvider appearance={{ baseTheme: dark }}>
 			<AppContextProvider>
 				<html lang='en' suppressHydrationWarning>
 					<body
-						className={`${inter.className} antialiased bg-[#0F1419] text-[#E6E6FA] min-h-screen flex flex-col`}>
+						className={`${inter.className} antialiased bg-[#0F1419] text-[#E6E6FA] min-h-screen flex flex-col overflow-x-hidden`}>
 						<Toaster
 							position='top-right'
 							toastOptions={{
@@ -77,6 +56,10 @@ export default function RootLayout({ children }) {
 									borderRadius: '8px',
 									fontFamily: 'Lumos, cursive',
 									boxShadow: '0 0 10px rgba(255, 215, 0, 0.2)',
+									padding: '8px 12px',
+									fontSize: '14px',
+									maxWidth: '90vw',
+									wordBreak: 'break-word',
 								},
 								success: {
 									iconTheme: {
@@ -91,15 +74,17 @@ export default function RootLayout({ children }) {
 									},
 								},
 							}}
+							containerStyle={{
+								top: '16px',
+								right: '16px',
+								zIndex: 9999,
+							}}
 						/>
-						<main aria-label='Lumos AI Main Content' className='flex-grow'>
+						<main
+							aria-label='Lumos AI Main Content'
+							className='flex-grow w-full'>
 							{children}
 						</main>
-						<footer
-							aria-label='Lumos AI Footer'
-							className='py-4 text-center text-[#E6E6FA]/60 text-sm hover:text-[#FFD700] transition-colors duration-300'>
-							© {new Date().getFullYear()} Lumos AI — Powered by Prayag
-						</footer>
 					</body>
 				</html>
 			</AppContextProvider>

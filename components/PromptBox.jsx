@@ -49,7 +49,9 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 		if (!user) {
 			toast.error('Please sign in to continue');
-			openSignIn();
+			openSignIn({
+				redirectUrl: '/',
+			});
 			return;
 		}
 		if (!selectedChat) {

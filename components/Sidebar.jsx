@@ -82,13 +82,6 @@ const Sidebar = ({ expand, setExpand }) => {
 		return () => document.removeEventListener('mousedown', handleClickOutside);
 	}, [expand, setExpand]);
 
-	// Open sign-in if user is not authenticated
-	useEffect(() => {
-		if (isLoaded && !userId) {
-			openSignIn();
-		}
-	}, [isLoaded, userId, openSignIn]);
-
 	// Simulate loading chats (replace with actual API call if needed)
 	useEffect(() => {
 		const timer = setTimeout(() => setIsLoadingChats(false), 1000);
@@ -443,7 +436,7 @@ const Sidebar = ({ expand, setExpand }) => {
 						<motion.div
 							whileHover={{ rotate: 5 }}
 							transition={{ duration: 0.2 }}
-							onClick={openSignIn}>
+							onClick={() => openSignIn({ redirectUrl: '/' })}>
 							<Image
 								src={assets.profile_icon}
 								alt='User Profile'

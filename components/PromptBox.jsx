@@ -49,13 +49,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 		if (!user) {
 			toast.error('Please sign in to continue');
-			openSignIn({
-				redirectUrl: '/',
-			});
-			return;
-		}
-		if (!selectedChat) {
-			toast.error('No chat selected');
+			openSignIn({ redirectUrl: '/' });
 			return;
 		}
 		if (isLoading) {
@@ -70,6 +64,28 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 		setIsLoading(true);
 		setPrompt('');
 
+		let currentChat = selectedChat;
+
+		// Create chat if one does not exist
+		if (!currentChat) {
+			try {
+				const { data } = await axios.post('/api/chat/create');
+				if (data.success && data.chat) {
+					setChats((prev) => [...prev, data.chat]);
+					setSelectedChat(data.chat);
+					currentChat = data.chat;
+				} else {
+					toast.error('Could not start a new chat');
+					setIsLoading(false);
+					return;
+				}
+			} catch (err) {
+				toast.error('Error starting a new chat');
+				setIsLoading(false);
+				return;
+			}
+		}
+
 		const userMessage = {
 			role: 'user',
 			content: trimmedPrompt,
@@ -78,19 +94,19 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 		setChats((prev) =>
 			prev.map((chat) =>
-				chat._id === selectedChat._id
+				chat._id === currentChat._id
 					? { ...chat, messages: [...chat.messages, userMessage] }
 					: chat
 			)
 		);
 		setSelectedChat((prev) => ({
 			...prev,
-			messages: [...(prev.messages || []), userMessage],
+			messages: [...(prev?.messages || []), userMessage],
 		}));
 
 		try {
 			const { data } = await axios.post('/api/chat/ai', {
-				chatId: selectedChat._id,
+				chatId: currentChat._id,
 				prompt: trimmedPrompt,
 			});
 
@@ -109,7 +125,7 @@ const PromptBox = ({ setIsLoading, isLoading }) => {
 
 			setChats((prev) =>
 				prev.map((chat) =>
-					chat._id === selectedChat._id
+					chat._id === currentChat._id
 						? { ...chat, messages: [...chat.messages, assistantPlaceholder] }
 						: chat
 				)

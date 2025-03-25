@@ -53,16 +53,6 @@ export default function Home() {
 				/>
 			)}
 
-			{/* Floating Golden Snitch */}
-			<Image
-				src='https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjloNTg4NzZxaTBrN2c5M3BneGhxOTBycWI1a2JmejQ5cmF6eGJxYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/7whxLJtwE80Ny/giphy.gif'
-				alt='Golden Snitch'
-				width={0}
-				height={0}
-				sizes='(max-width: 400px) 30px, (max-width: 640px) 40px, (max-width: 1024px) 60px, 80px'
-				className='absolute top-4 right-4 opacity-80 animate-pulse w-8 sm:w-10 md:w-16 lg:w-20 h-auto max-w-[50px] z-0'
-			/>
-
 			<div className='flex w-full h-full relative z-10 overflow-hidden'>
 				<Sidebar expand={expand} setExpand={setExpand} />
 
@@ -145,7 +135,7 @@ export default function Home() {
 										height={28}
 									/>
 									<Image
-										src='https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif'
+										src='https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcnBkdWN1ZGs4cGF1ZnhrbzBiYnk5NGE2c2lub2I2N3d3MzdjamlkbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/Wle7T7InVfr46Y0jgA/giphy.gif'
 										alt='Wand Loading'
 										width={32}
 										height={32}

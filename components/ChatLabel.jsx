@@ -9,14 +9,21 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const menuVariants = {
-	hidden: { opacity: 0, y: -5, scale: 0.95 },
+	hidden: { opacity: 0, y: -5, x: 10, scale: 0.95 },
 	visible: {
 		opacity: 1,
 		y: 0,
+		x: 0,
 		scale: 1,
 		transition: { duration: 0.2, ease: 'easeOut' },
 	},
-	exit: { opacity: 0, y: -5, scale: 0.95, transition: { duration: 0.15 } },
+	exit: {
+		opacity: 0,
+		y: -5,
+		x: 10,
+		scale: 0.95,
+		transition: { duration: 0.15 },
+	},
 };
 
 const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
@@ -56,7 +63,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 				setRenameMode(false);
 				setOpenMenu({ id: 0, open: false });
 			}
-		} catch (err) {
+		} catch {
 			toast.error('Rename failed.');
 		}
 	};
@@ -72,7 +79,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 				fetchUsersChats();
 				setOpenMenu({ id: 0, open: false });
 			}
-		} catch (err) {
+		} catch {
 			toast.error('Delete failed.');
 		} finally {
 			setIsDeleting(false);
@@ -81,17 +88,17 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 
 	return (
 		<motion.div
-			className='relative flex items-center justify-between p-2 sm:p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] select-none transition-colors'
+			className='relative flex items-center justify-between p-2 sm:p-3 bg-[#1A1C26] rounded-md cursor-pointer hover:bg-[#2A2D3A] transition-colors'
 			onClick={selectChat}>
-			<p className='truncate text-[#E6E6FA] font-lumos text-sm sm:text-base md:text-lg font-bold'>
+			<p className='truncate text-[#E6E6FA] font-lumos text-sm sm:text-base md:text-lg font-medium'>
 				{name || 'Untitled Chat'}
 			</p>
 
-			<div className='relative'>
+			<div className='relative z-30'>
 				<motion.button
 					onClick={toggleMenu}
 					className='h-6 w-6 sm:h-7 sm:w-7 flex items-center justify-center rounded-full hover:bg-[#2A2D3A] transition-colors'
-					whileHover={{ scale: 1.15 }}
+					whileHover={{ scale: 1.1 }}
 					whileTap={{ scale: 0.95 }}
 					aria-label='Chat options'>
 					<Image
@@ -106,7 +113,7 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 				<AnimatePresence>
 					{openMenu.id === id && openMenu.open && (
 						<motion.div
-							className='absolute right-0 top-8 sm:top-9 bg-[#1A1C26] border border-gray-700 rounded-md p-1.5 sm:p-2 w-40 sm:w-44 shadow-2xl z-50 space-y-1'
+							className='absolute right-0 top-10 origin-top-right bg-[#1C1F2B] border border-gray-700 rounded-lg p-2 w-44 min-w-max shadow-xl z-50'
 							initial='hidden'
 							animate='visible'
 							exit='exit'
@@ -119,12 +126,12 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 										value={newName}
 										onChange={(e) => setNewName(e.target.value)}
 										autoFocus
-										className='w-full text-xs sm:text-sm px-2 py-1 rounded bg-[#2A2D3A] border border-gray-600 text-[#E6E6FA]'
+										className='w-full absolute text-xs sm:text-sm px-2 py-1 rounded bg-[#2A2D3A] border border-gray-600 text-[#E6E6FA] focus:outline-none focus:ring-1 focus:ring-yellow-400'
 										placeholder='Enter new name...'
 									/>
 									<button
 										type='submit'
-										className='bg-yellow-400 px-2 py-1 rounded text-black text-xs sm:text-sm hover:bg-yellow-500'>
+										className='bg-yellow-400 px-2 py-1 rounded text-black text-xs sm:text-sm hover:bg-yellow-500 transition-colors'>
 										Save
 									</button>
 								</form>
@@ -132,12 +139,12 @@ const ChatLabel = ({ openMenu, setOpenMenu, id, name }) => {
 								<>
 									<button
 										onClick={() => setRenameMode(true)}
-										className='w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-[#E6E6FA] transition'>
+										className='w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded text-[#E6E6FA] transition-colors'>
 										Rename
 									</button>
 									<button
 										onClick={handleDelete}
-										className={`w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded transition ${
+										className={`w-full text-left text-xs sm:text-sm px-2 py-1 hover:bg-[#2A2D3A] rounded transition-colors ${
 											isDeleting ? 'text-gray-400' : 'text-red-400'
 										}`}
 										disabled={isDeleting}>

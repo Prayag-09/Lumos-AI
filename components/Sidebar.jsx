@@ -8,17 +8,15 @@ import { useAppContext } from '@/context/AppContext';
 import ChatLabel from './ChatLabel';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Animation variants for sidebar expansion with responsive widths
+// Animation variants for sidebar expansion
 const sidebarVariants = {
 	expanded: {
-		width: '14rem', // Default for desktop
+		width: '14rem', // Base width (will be overridden by CSS for smaller screens)
 		padding: '0.75rem',
-		'@media (max-width: 640px)': { width: '12rem', padding: '0.5rem' }, // Smaller width on smartphones
 	},
 	collapsed: {
 		width: '4.5rem',
 		padding: '0.5rem',
-		'@media (max-width: 640px)': { width: '3.5rem', padding: '0.5rem' }, // Even smaller on smartphones
 	},
 };
 
@@ -105,7 +103,7 @@ const Sidebar = ({ expand, setExpand }) => {
 
 	return (
 		<motion.div
-			className='flex flex-col justify-between h-screen max-md:fixed max-md:z-50 bg-[#1A1C26] text-[#E6E6FA] shadow-lg shadow-[#FFD700]/10'
+			className='sidebar flex flex-col justify-between h-screen max-md:fixed max-md:z-50 bg-[#1A1C26] text-[#E6E6FA] shadow-lg shadow-[#FFD700]/10 relative'
 			animate={expand ? 'expanded' : 'collapsed'}
 			variants={sidebarVariants}
 			initial={false}
@@ -119,7 +117,7 @@ const Sidebar = ({ expand, setExpand }) => {
 				{/* Header with Logo and Toggle */}
 				<div
 					className={`flex items-center px-2 sm:px-3 ${
-						expand ? 'flex-row gap-2' : 'flex-col gap-2 items-center'
+						expand ? 'justify-between' : 'flex-col gap-2 items-center'
 					}`}>
 					<motion.div
 						variants={logoVariants}
@@ -129,22 +127,23 @@ const Sidebar = ({ expand, setExpand }) => {
 							className='rounded-full border-2 border-[#FFD700]/40 hover:border-[#FFD700]/60 transition-all duration-300'
 							src='https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGZtanhzY2tpdWpteTh2Z2NodWJ2dzBya2d2c2R1anFydWdsZzhweSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/dgzRXtAF6gTd0xXMJx/giphy.gif'
 							alt='Lumos AI Logo'
-							width={expand ? 40 : 36} // Smaller on smartphones
+							width={expand ? 40 : 36}
 							height={expand ? 40 : 36}
 							priority
 						/>
 					</motion.div>
 
-					{/* Lumos Logo */}
-					<motion.div
-						className={`text-center ${expand ? 'block' : 'hidden'}`}
-						initial={{ opacity: 0, y: -10 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.3, delay: 0.2, ease: 'easeOut' }}>
-						<span className='text-[#FFD700] font-lumos text-lg sm:text-xl md:text-2xl tracking-wide'>
-							Lumos AI ✨
-						</span>
-					</motion.div>
+					{/* Lumos Logo Text */}
+					{expand && (
+						<motion.div
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3, delay: 0.2, ease: 'easeOut' }}>
+							<span className='text-[#FFD700] font-lumos text-lg sm:text-xl md:text-2xl tracking-wide'>
+								Lumos AI ✨
+							</span>
+						</motion.div>
+					)}
 
 					{/* Sidebar Toggle Button */}
 					<motion.div
@@ -154,7 +153,8 @@ const Sidebar = ({ expand, setExpand }) => {
 						onMouseLeave={() => setShowTooltip(null)}
 						whileHover={{ scale: 1.1 }}
 						whileTap={{ scale: 0.9 }}
-						role='button'>
+						role='button'
+						aria-label={expand ? 'Close sidebar' : 'Open sidebar'}>
 						<Image
 							src={expand ? assets.sidebar_close_icon : assets.sidebar_icon}
 							alt={expand ? 'Close sidebar' : 'Open sidebar'}
@@ -167,7 +167,7 @@ const Sidebar = ({ expand, setExpand }) => {
 						<AnimatePresence>
 							{showTooltip === 'toggle' && (
 								<motion.div
-									className={`absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs px-2 py-1 rounded-lg shadow-lg pointer-events-none z-10 ${
+									className={`absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs px-2 py-1 rounded-lg shadow-lg pointer-events-none z-50 ${
 										expand ? 'left-1/2 -translate-x-1/2 top-9' : 'left-0 -top-9'
 									}`}
 									initial='hidden'
@@ -235,7 +235,7 @@ const Sidebar = ({ expand, setExpand }) => {
 					<AnimatePresence>
 						{!expand && showTooltip === 'newChat' && (
 							<motion.div
-								className='absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs px-2 py-1 rounded-lg shadow-lg pointer-events-none z-10 -top-9 left-10'
+								className='absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs px-2 py-1 rounded-lg shadow-lg pointer-events-none z-50 -top-9 left-10'
 								initial='hidden'
 								animate='visible'
 								exit='hidden'
@@ -251,7 +251,7 @@ const Sidebar = ({ expand, setExpand }) => {
 				<motion.div
 					className={`mt-3 px-2 sm:px-3 py-1 text-[#E6E6FA]/80 ${
 						expand ? 'block' : 'hidden'
-					} z-20`}
+					} recent-chats-container`}
 					initial={{ opacity: 0 }}
 					animate={{ opacity: expand ? 1 : 0 }}
 					transition={{ duration: 0.4, delay: 0.2 }}>
@@ -287,13 +287,14 @@ const Sidebar = ({ expand, setExpand }) => {
 						Recent Chats
 					</motion.p>
 					<hr className='border-[#FFD700]/20 mb-1 sm:mb-2' />
-					<div className='space-y-1 sm:space-y-2 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto scrollbar-thin scrollbar-thumb-[#FFD700]/50 scrollbar-track-transparent pr-1'>
+					<div className='space-y-1 sm:space-y-2 max-h-[40vh] sm:max-h-[45vh] overflow-y-auto scrollbar-thin scrollbar-thumb-[#FFD700]/50 hover:scrollbar-thumb-[#FFD700]/70 scrollbar-track-transparent pr-1 sm:pr-2 scroll-smooth'>
 						{isLoadingChats ? (
 							<motion.p
 								className='text-xs sm:text-sm text-[#E6E6FA]/40 italic font-lumos animate-pulse'
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
-								transition={{ duration: 0.3 }}>
+								transition={{ duration: 0.3 }}
+								aria-live='polite'>
 								Loading chats...
 							</motion.p>
 						) : filteredChats.length > 0 ? (
@@ -303,13 +304,18 @@ const Sidebar = ({ expand, setExpand }) => {
 									custom={i}
 									initial='hidden'
 									animate='visible'
+									exit='hidden'
 									variants={fadeInVariants}
-									className='relative group z-40'>
+									layout
+									whileHover={{ scale: 1.02 }}
+									whileTap={{ scale: 0.98 }}
+									className='w-[90%] absolute z-[999]'>
 									<ChatLabel
 										name={chat.name}
 										id={chat._id}
 										openMenu={openMenu}
 										setOpenMenu={setOpenMenu}
+										expand={expand}
 									/>
 								</motion.div>
 							))
@@ -318,7 +324,8 @@ const Sidebar = ({ expand, setExpand }) => {
 								className='text-xs sm:text-sm text-[#E6E6FA]/40 italic font-lumos'
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
-								transition={{ duration: 0.3, delay: 0.3 }}>
+								transition={{ duration: 0.3, delay: 0.3 }}
+								aria-live='polite'>
 								{searchQuery ? 'No matching chats' : 'No recent chats'}
 							</motion.p>
 						)}
@@ -387,7 +394,7 @@ const Sidebar = ({ expand, setExpand }) => {
 					<AnimatePresence>
 						{showTooltip === 'getApp' && (
 							<motion.div
-								className={`absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs p-2 rounded-lg shadow-lg z-10 ${
+								className={`absolute w-max bg-[#0F1419] text-[#E6E6FA] text-xs p-2 rounded-lg shadow-lg z-50 ${
 									expand
 										? '-top-36 sm:-top-40'
 										: '-top-36 sm:-top-40 -right-28 sm:-right-32'
